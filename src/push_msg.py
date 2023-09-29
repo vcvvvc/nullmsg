@@ -74,7 +74,7 @@ class PushMsg(object):
             try:
                 res = requests.post(sendurl, headers=self.headers, data=data, timeout=30)
                 if res.status_code == 200:
-                    print('发送成功', res.text)
+                    print('发送成功')
                     break
             except Exception as e:
                 print(e)
