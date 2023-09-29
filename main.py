@@ -13,12 +13,14 @@ def run():
     t3 = threading.Thread(target=Tl.get_news, args=())
     # t4 = threading.Thread(target=coin_time.get_news, args=())
     t4 = threading.Thread(target=server, args=())
+    t5 = threading.Thread(target=Js.heartbeat, args=())
     t1.start()
     time.sleep(3)
     t2.start()
     time.sleep(3)
     t3.start()
     t4.start()
+    t5.start()
     # t4.start()
 
 def server():
@@ -30,7 +32,6 @@ def server():
     server_obj.serve_forever()  # 启动服务器
 
 if __name__ == '__main__':
-
     run()
     # Js.get_news()
     # oda.get_news()
