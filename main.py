@@ -18,8 +18,8 @@ def run():
 
 
 if __name__ == '__main__':
-    # run()
-    Js.get_news()
+    run()
+    # Js.get_news()
     # oda.get_news()
     # ti.get_news()
     # Tl.get_news()
