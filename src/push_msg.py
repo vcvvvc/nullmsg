@@ -70,7 +70,7 @@ class PushMsg(object):
 
         sendurl = 'https://bark-test-cje9.onrender.com/quicknews'
 
-        for ll in range(5):
+        for ll in range(3):
             try:
                 res = requests.post(sendurl, headers=self.headers, data=data, timeout=30)
                 if res.status_code == 200:
