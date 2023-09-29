@@ -33,7 +33,6 @@ class TOKEN_IN(object):
                 if res.status_code == 200:
                     one_json = json.loads(res.text)
                     m_json = one_json['data']['list']
-                    print(m_json)
                     if self.topid == m_json[0]['id']:
                         print('topid == json_topid' )
                         time.sleep(6000)
