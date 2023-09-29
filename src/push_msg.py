@@ -24,8 +24,6 @@ class PushMsg(object):
             m_json = '{{"title": "{0}","body": "{1}", "url": "{2}", "sound": "healthnotification"}}'.format(
                 news_title.replace("\"", "\\\""), news_content.replace("\n", "\\n").replace("\"", "\\\""), news_url)
 
-            print(m_json)
-
             # 把字符串转换为字节
             message = m_json.encode()
             # 对字节进行填充，使其长度为16的倍数
@@ -74,7 +72,7 @@ class PushMsg(object):
             try:
                 res = requests.post(sendurl, headers=self.headers, data=data, timeout=30)
                 if res.status_code == 200:
-                    print('发送成功')
+                    print('发送成功', res.text)
                     break
             except Exception as e:
                 print(e)
