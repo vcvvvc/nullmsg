@@ -11,7 +11,6 @@ def run():
     t1 = threading.Thread(target=Js.get_news, args=())
     t2 = threading.Thread(target=oda.get_news, args=())
     t3 = threading.Thread(target=Tl.get_news, args=())
-    # t4 = threading.Thread(target=coin_time.get_news, args=())
     t4 = threading.Thread(target=server, args=())
     t5 = threading.Thread(target=Js.heartbeat, args=())
     t1.start()
@@ -19,9 +18,8 @@ def run():
     t2.start()
     time.sleep(3)
     t3.start()
-    t4.start()
     t5.start()
-    # t4.start()
+    t4.start()
 
 def server():
     webdir = './index'  # 设置网站的根目录为程序所在路径
