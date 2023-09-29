@@ -9,6 +9,17 @@ class Jinse(object):
         self.topid = '0'
         self.date = ''
 
+    def heartbeat(self): #render无活动时间久了会暂停服务，定时get活动一下
+        while True:
+            time.sleep(40)
+            pushurl = 'https://pushmsg.onrender.com'
+            sendurl = 'https://bark-test-cje9.onrender.com'
+            headers2 = {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15'
+            }
+            requests.get(sendurl, headers=headers2, timeout=30)
+            requests.get(pushurl, headers=headers2, timeout=30)
+
     def get_news(self):
         while True:
             url = 'https://api.jinse.cn/noah/v2/lives?limit=20&reading=false&source=web'
