@@ -45,8 +45,8 @@ def heartbeat(): #render无活动时间久了会暂停服务，定时get活动�
             requests.get(pushurl, headers=headers2, timeout=30)
 
 if __name__ == '__main__':
-    # run()
-    Js.get_news()
+    run()
+    # Js.get_news()
     # oda.get_news()
     # ti.get_news()
     # Tl.get_news()
