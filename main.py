@@ -18,7 +18,7 @@ def run():
     t2.start()
     time.sleep(3)
     t3.start()
-    # t4.start()
+    t4.start()
 
 def server():
     webdir = './index'  # 设置网站的根目录为程序所在路径
@@ -30,7 +30,7 @@ def server():
 
 def heartbeat(): #render无活动时间久了会暂停服务，定时get活动一下
     while True:
-        time.sleep(40)
+        time.sleep(60)
         try:
             pushurl = 'https://pushmsg.onrender.com'
             sendurl = 'https://bark-test-cje9.onrender.com'
@@ -40,10 +40,10 @@ def heartbeat(): #render无活动时间久了会暂停服务，定时get活动�
             res = requests.get(sendurl, headers=headers2, timeout=60)
             if res.status_code != 200 or res.status_code != 404:
                 res = requests.get(sendurl, headers=headers2, timeout=60)
-            #
-            # requests.get(pushurl, headers=headers2, timeout=60)
-            # if res.status_code != 200 or res.status_code != 404:
-            #     requests.get(pushurl, headers=headers2, timeout=60)
+
+            requests.get(pushurl, headers=headers2, timeout=60)
+            if res.status_code != 200 or res.status_code != 404:
+                requests.get(pushurl, headers=headers2, timeout=60)
         except:
             continue
 
