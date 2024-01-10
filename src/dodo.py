@@ -18,27 +18,7 @@ class DODO(object):
         }
         content = '准备注册准备注册准备注册'
 
-        while True:
-            try:
-                res = requests.get(url, headers=headers, timeout=30)
-                if res.status_code == 200:
-                    if res.headers['Content-Type'] == 'text/html;charset=UTF-8':
-                        for _ in range(10):
-                            Pmsg.sendmeg(url, content, "{0}, 已被注册".format(url))
-                            time.sleep(5)
-                        url = 'https://www.imdodo.com/s/233785'
-                        content = "785已经注册，准备注册788，1000888"
-                        time.sleep(100)
-                        continue
-
-                    m_json = json.loads(res.text)
-                    if m_json['status'] == -500:
-                        time.sleep(600)
-                        continue
-
-            except Exception as e:
-                time.sleep(600)
-                print(e)
+        pass
 
 
     def get_news(self):
