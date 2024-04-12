@@ -35,7 +35,7 @@ class Jinse(object):
                     m_json = json.loads(res.text)
                     if self.topid == m_json['top_id']:
                         print('jin_topid == json_topid' )
-                        time.sleep(600)
+                        time.sleep(300)
                         continue
 
                     m_list = m_json['list']
@@ -74,9 +74,9 @@ class Jinse(object):
                     self.date = m_list[0]['date']
                     self.topid = m_json['top_id']
                     print("jin_发送成功 timesleep")
-                time.sleep(600)
+                time.sleep(300)
             except Exception as e:
-                time.sleep(600)
                 print(e)
+                time.sleep(600)
 
 Js = Jinse()

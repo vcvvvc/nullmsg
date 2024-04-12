@@ -22,8 +22,9 @@ class PushMsg(object):
             self.cipher = AES.new(self.aes_key.encode(), AES.MODE_CBC, self.aes_iv.encode())
 
             m_json = '{{"title": "{0}","body": "{1}", "url": "{2}", "sound": "healthnotification"}}'.format(
-                news_title.replace("\"", "\\\""), news_content.replace("\n", "\\n").replace("\"", "\\\""), news_url)
+                news_title.replace("\"", "\\\""), news_content.replace("\n", "\\n").replace("\"", "\\\"").replace("\r\n", "\\n"), news_url)
 
+            # print(m_json)
             # 把字符串转换为字节
             message = m_json.encode()
             # 对字节进行填充，使其长度为16的倍数
@@ -63,7 +64,7 @@ class PushMsg(object):
         ciphertext = self.deal_msg(news_url, news_content, news_title)
         data = {
             "ciphertext": ciphertext,
-            "iv": "{0}".format(self.aes_iv)
+            "iv": "{0}".format(self.aes_iv),
         }
 
         sendurl = 'https://bark-test-cje9.onrender.com/quicknews'
