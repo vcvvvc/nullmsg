@@ -7,7 +7,7 @@ from src.push_msg import Pmsg
 class Pannews(object):
     def __init__(self):
         self.topid = 0
-        self.date = ''
+        self.art_id = 'en5mtun6'
 
     def get_news(self):
         while True:
@@ -36,12 +36,15 @@ class Pannews(object):
                             content_prefix = m_lives[n]['title']
                             id = m_lives[n]['id']
                             news_url = 'www.panewslab.com/zh/sqarticledetails/{0}.html'.format(id)
+                            if self.art_id == id:
+                                break
                             Pmsg.sendmeg(news_url, content.replace("\r\n", "\n"), content_prefix)
                             time.sleep(3)
                         except Exception as e:
                             print(e)
 
                     self.topid = m_id
+                    self.art_id = m_lives[0]['id']
                     print("pan_发送成功 timesleep")
                 time.sleep(300)
             except Exception as e:

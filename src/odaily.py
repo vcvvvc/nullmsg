@@ -44,7 +44,7 @@ class oDaily(object):
                     print("od_发送成功 timesleep")
                 time.sleep(600)
             except Exception as e:
-                time.sleep(600)
                 print(e)
+                time.sleep(600)
 
 oda = oDaily()
