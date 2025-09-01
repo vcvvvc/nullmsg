@@ -22,8 +22,10 @@ class Treenews(object):
                 if res.status_code == 200:
                     tree_json = json.loads(res.text)
                     # print(tree_json)
+                    print(tree_json[0]['_id'], "\n")
                     for news in tree_json:    
                         id = news['_id']
+                        print(id)
 
                         if self.topid == id:
                             time.sleep(300)
@@ -50,7 +52,8 @@ class Treenews(object):
                         Pmsg.sendmeg(link, content, title)
                         time.sleep(3)
                         
-                    
+                self.topid = news[0]['_id']
+                print
                 time.sleep(300)    
             except Exception as e:
                 print(e)

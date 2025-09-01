@@ -19,11 +19,11 @@ def run():
     try:
         # 定义任务列表
         tasks = [
-            ('Jinse', Js.get_news),
-            ('Odaily', oda.get_news),
-            ('Tuoluo', Tl.get_news),
-            ('PanNews', PAN.get_news),
-            ('BWENews', bwe.get_news),
+            # ('Jinse', Js.get_news),
+            # ('Odaily', oda.get_news),
+            # ('Tuoluo', Tl.get_news),
+            # ('PanNews', PAN.get_news),
+            # ('BWENews', bwe.get_news),
             ('TreeNews', tree.get_news),
             ('WebServer', server)
         ]
