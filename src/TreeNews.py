@@ -26,8 +26,8 @@ class Treenews(object):
                         id = news['_id']
 
                         if self.topid == id:
-                            time.sleep(600)
-                            continue
+                            time.sleep(300)
+                            break
 
                         title = news['title']
                         link = news['url'].replace("https://", "www.")       
@@ -51,7 +51,7 @@ class Treenews(object):
                         time.sleep(3)
                         
                     
-                time.sleep(600)    
+                time.sleep(300)    
             except Exception as e:
                 print(e)
                 time.sleep(600)

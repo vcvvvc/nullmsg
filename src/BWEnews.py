@@ -27,7 +27,7 @@ class BWEnews(object):
 
                     if not feed.entries:
                         print("Feed 为空或解析失败，稍后重试。")
-                        time.sleep(600)
+                        time.sleep(300)
                         continue
 
                     current_latest_entry = feed.entries[0]
@@ -35,7 +35,7 @@ class BWEnews(object):
 
                     if current_latest_id == self.topid:
                         print('od_topid == json_topid')
-                        time.sleep(600)
+                        time.sleep(300)
                         continue
 
                     # 从最新的一条开始遍历，直到找到上次记录的ID
@@ -64,7 +64,7 @@ class BWEnews(object):
 
                     self.topid = current_latest_id
                     print("bwe_发送成功 timesleep")
-                time.sleep(600)
+                time.sleep(300)
             except Exception as e:
                 print(e)
                 time.sleep(600)

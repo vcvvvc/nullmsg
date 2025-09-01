@@ -24,7 +24,7 @@ class TuoLuo(object):
                     m_json = tl_json['data']['list']
                     if self.topid == m_json[0]['s_id']:
                         print('tl_topid == json_topid' )
-                        time.sleep(600)
+                        time.sleep(300)
                         continue
 
                     for n in range(len(m_json)):
@@ -41,7 +41,7 @@ class TuoLuo(object):
 
                     self.topid = m_json[0]['s_id']
                     print("tl_发送成功 timesleep")
-                time.sleep(600)
+                time.sleep(300)
             except Exception as e:
                 time.sleep(600)
                 print(e)

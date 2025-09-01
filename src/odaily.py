@@ -24,7 +24,7 @@ class oDaily(object):
                     m_json = od_json['data']['list']
                     if self.topid == m_json[0]['id']:
                         print('od_topid == json_topid' )
-                        time.sleep(600)
+                        time.sleep(300)
                         continue
 
                     for n in range(len(m_json)):
@@ -41,7 +41,7 @@ class oDaily(object):
 
                     self.topid = m_json[0]['id']
                     print("od_发送成功 timesleep")
-                time.sleep(600)
+                time.sleep(300)
             except Exception as e:
                 print(e)
                 time.sleep(600)
