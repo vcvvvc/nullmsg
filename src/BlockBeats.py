@@ -23,7 +23,7 @@ class BlockBeats(object):
                     m_json = json.loads(res.text)
                     m_list = m_json['data']['list']
                     m_id = m_list[0]['article_id']
-                    print(m_id, "\n")
+                    # print(m_id, "\n")
 
 
                     if self.topid == m_id:
@@ -39,8 +39,8 @@ class BlockBeats(object):
                             content_html = bnews.get('content', '')
                             content_text = re.sub(r'<[^>]+>', '', content_html)
                             link = f"www.theblockbeats.info/flash/{article_id}"
-                            print(title, link)
-                            print(content_text)
+                            # print(title, link)
+                            # print(content_text)
 
                             Pmsg.sendmeg(link, content_text, title)
                             time.sleep(3)
@@ -48,7 +48,7 @@ class BlockBeats(object):
                             print(e)
 
                     self.topid = m_id
-                    print("pan_发送成功 timesleep")
+                    print("beats_发送成功 timesleep")
                 time.sleep(300)
             except Exception as e:
                 print(e)
