@@ -6,7 +6,7 @@ from src.push_msg import Pmsg
 
 class Treenews(object):
     def __init__(self):
-        self.topid = None
+        self.topid = "1962701984504652098"
         self.date = ''
 
     def get_news(self):
@@ -15,25 +15,23 @@ class Treenews(object):
             url = 'https://news.treeofalpha.com/api/news?limit=10'
             headers = {
                 'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
-                'Referer': 'https://m.odaily.news',
             }
             try:
                 res = requests.get(url, headers=headers, timeout=30)
                 if res.status_code == 200:
                     tree_json = json.loads(res.text)
-                    # print(tree_json)
-                    print(tree_json[0]['_id'], "\n")
+
                     for news in tree_json:    
                         id = news['_id']
-                        print(id)
+                        # print(id)
 
                         if self.topid == id:
-                            time.sleep(300)
+                            time.sleep(3)
                             break
 
                         title = news['title']
                         link = news['url'].replace("https://", "www.")       
-                        content = ' '                 
+                        content = ' '
                         # print(news['title'])
                         # print(f"🔗 【链接】: {link}")
                         # print(f"📡 【来源】: {news.get('source', 'Unknown')}")
@@ -53,7 +51,8 @@ class Treenews(object):
                         time.sleep(3)
                         
                 self.topid = news[0]['_id']
-                print
+                print(self.topid)
+
                 time.sleep(300)    
             except Exception as e:
                 print(e)
