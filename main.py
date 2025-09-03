@@ -14,32 +14,124 @@ from src.odaily import oda
 from src.tuoluo import Tl
 from src.PanNews import PAN
 
+# 全局变量，用于存储和管理线程
+running_threads = {}
+# 线程锁，用于保护对 running_threads 的访问
+threads_lock = threading.Lock()
+
 def run():
     """
-    启动所有任务为后台守护线程并立即返回，让主线程继续执行 heartbeat。
+    启动所有任务为后台守护线程并监控其状态。
+    返回值：
+        bool: 所有任务是否成功启动
     """
-    try:
-        tasks = [
-            ('Jinse', Js.get_news),
-            ('Odaily', oda.get_news),
-            ('CoinTime', coin_time.get_news),
-            ('Tuoluo', Tl.get_news),
-            ('PanNews', PAN.get_news),
-            ('BWENews', bwe.get_news),
-            ('TreeNews', tree.get_news),
-            ('Beats', beat.get_news),
-            ('WebServer', server)
-        ]
+    # 按优先级排序的任务列表
+    tasks = [
+        # 核心服务优先启动
+        ('WebServer', server),
+        # 新闻采集服务
+        ('Jinse', Js.get_news),
+        ('Odaily', oda.get_news),
+        ('CoinTime', coin_time.get_news),
+        ('Tuoluo', Tl.get_news),
+        ('PanNews', PAN.get_news),
+        ('BWENews', bwe.get_news),
+        ('TreeNews', tree.get_news),
+        ('Beats', beat.get_news),
+    ]
 
+    try:
+        # 清理已存在的线程记录
+        with threads_lock:
+            running_threads.clear()
+        
+        # 启动所有任务
         for task_name, task_func in tasks:
-            t = threading.Thread(target=task_func, name=f"{task_name}Thread", daemon=True)
-            t.start()
-            print(f"✅ 任务 {task_name} 已作为守护线程启动: {t.name}")
+            try:
+                # 创建新线程
+                thread = threading.Thread(
+                    target=task_func,
+                    name=f"{task_name}Thread",
+                    daemon=True
+                )
+                # 保存线程引用
+                with threads_lock:
+                    running_threads[task_name] = {
+                        'thread': thread,
+                        'function': task_func,
+                        'start_time': time.time(),
+                        'restarts': 0
+                    }
+                # 启动线程
+                thread.start()
+                print(f"✅ 任务 {task_name} 已启动: {thread.name}")
+                
+                # 对于核心服务，等待其完全启动
+                if task_name == 'WebServer':
+                    time.sleep(1)  # 给予WebServer启动时间
+                    if not thread.is_alive():
+                        raise Exception(f"{task_name} 启动失败")
+                
+            except Exception as e:
+                print(f"❌ 任务 {task_name} 启动失败: {str(e)}")
+                # 如果是核心服务启动失败，则终止整个程序
+                if task_name == 'WebServer':
+                    raise
+                continue  # 其他服务失败则继续启动下一个
+
+        # 启动线程监控
+        monitor_thread = threading.Thread(
+            target=monitor_threads,
+            name="ThreadMonitor",
+            daemon=True
+        )
+        monitor_thread.start()
+        print("✅ 线程监控服务已启动")
 
         return True
+
     except Exception as e:
-        print(f"运行主函数时发生错误: {str(e)}")
+        print(f"❌ 运行主函数时发生错误: {str(e)}")
         raise
+
+def monitor_threads():
+    """
+    监控线程状态，重启异常退出的线程
+    """
+    while True:
+        try:
+            # 使用线程锁复制当前线程字典，避免遍历时的修改
+            with threads_lock:
+                threads_to_check = dict(running_threads)
+            
+            for task_name, info in threads_to_check.items():
+                thread = info['thread']
+                if not thread.is_alive():
+                    print(f"⚠️ 检测到任务 {task_name} 已停止，尝试重启...")
+                    try:
+                        # 创建新线程
+                        new_thread = threading.Thread(
+                            target=info['function'],
+                            name=f"{task_name}Thread",
+                            daemon=True
+                        )
+                        
+                        # 使用线程锁更新线程信息
+                        with threads_lock:
+                            if task_name in running_threads:  # 再次检查任务是否还存在
+                                running_threads[task_name]['thread'] = new_thread
+                                running_threads[task_name]['restarts'] += 1
+                                running_threads[task_name]['start_time'] = time.time()
+                                # 启动新线程
+                                new_thread.start()
+                                print(f"✅ 任务 {task_name} 已重启 (重启次数: {running_threads[task_name]['restarts']})")
+                    except Exception as e:
+                        print(f"❌ 任务 {task_name} 重启失败: {str(e)}")
+                        
+        except Exception as e:
+            print(f"❌ 线程监控异常: {str(e)}")
+        
+        time.sleep(15)  # 每5秒检查一次
 
 
 def server():
@@ -76,8 +168,8 @@ if __name__ == '__main__':
    
     try:
         run()
-        print("✅ 所有服务启动成功！")
-        print("💓 心跳检测服务已启动...")
+        print("✅ 所有采集服务启动")
+        print("💓 心跳检测服务启动...")
         heartbeat()
     except Exception as e:
         print(f"❌ 服务启动失败: {str(e)}")

@@ -20,7 +20,7 @@ class Treenews(object):
                 res = requests.get(url, headers=headers, timeout=30)
                 if res.status_code == 200:
                     tree_json = json.loads(res.text)
-                    print(tree_json[0]['_id'])
+                    # print(tree_json[0]['_id'])
 
                     for news in tree_json:    
                         id = news['_id']
