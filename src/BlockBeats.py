@@ -42,7 +42,7 @@ class BlockBeats(object):
                             # print(title, link)
                             # print(content_text)
 
-                            Pmsg.sendmeg(link, content_text, title)
+                            Pmsg.sendmeg(link, content_text, title, "BlockBeats")
                             time.sleep(3)
                         except Exception as e:
                             print(e)

@@ -20,6 +20,7 @@ class Treenews(object):
                 res = requests.get(url, headers=headers, timeout=30)
                 if res.status_code == 200:
                     tree_json = json.loads(res.text)
+                    print(tree_json[0]['_id'])
 
                     for news in tree_json:    
                         id = news['_id']
@@ -47,11 +48,11 @@ class Treenews(object):
                                 title = parts[0]
                                 # 列表的第二个元素是 content
                                 content = parts[1]
-                        Pmsg.sendmeg(link, content, title)
+                        Pmsg.sendmeg(link, content, title, "Treenews")
                         time.sleep(3)
                         
-                self.topid = news[0]['_id']
-                print(self.topid)
+                    self.topid = tree_json[0]['_id']
+                    print("Treenews_发送成功 timesleep")
 
                 time.sleep(300)    
             except Exception as e:

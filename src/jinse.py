@@ -44,13 +44,13 @@ class Jinse(object):
                         try:
                             content = m_lives[n]['content']
                             content_prefix = m_lives[n]['content_prefix']
-                            id = m_lives[n]['id']
-                            news_url = 'www.jinse.cn/lives/{0}.html'.format(id)
-                            if self.topid == id:
+                            current_id = m_lives[n]['id']
+                            news_url = 'www.jinse.cn/lives/{0}.html'.format(current_id)
+                            if self.topid == current_id:
                                 print("jin_topid == json_id")
                                 break
                             else:
-                                Pmsg.sendmeg(news_url, content, content_prefix)
+                                Pmsg.sendmeg(news_url, content, content_prefix, "jinse")
                                 time.sleep(3)
                         except Exception as e:
                             print(e)
@@ -61,13 +61,13 @@ class Jinse(object):
                                 m_lives = m_list[1]['lives']
                                 content = m_lives[n]['content']
                                 content_prefix = m_lives[n]['content_prefix']
-                                id = m_lives[n]['id']
-                                news_url = 'https://www.jinse.cn/lives/{0}.html'.format(id)
-                                if self.topid == id:
+                                current_id = m_lives[n]['id']
+                                news_url = 'www.jinse.cn/lives/{0}.html'.format(current_id)
+                                if self.topid == current_id:
                                     print("jin_topid == json_id")
                                     break
                                 else:
-                                    Pmsg.sendmeg(news_url, content, content_prefix)
+                                    Pmsg.sendmeg(news_url, content, content_prefix, "jinse")
                                     time.sleep(3)
                             except Exception as e:
                                 print(e)

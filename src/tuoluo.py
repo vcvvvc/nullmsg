@@ -36,7 +36,7 @@ class TuoLuo(object):
                             print("tl_topid == json_id")
                             break
                         else:
-                            Pmsg.sendmeg(news_url, content, content_title)
+                            Pmsg.sendmeg(news_url, content, content_title, "TuoLuo")
                             time.sleep(3)
 
                     self.topid = m_json[0]['s_id']

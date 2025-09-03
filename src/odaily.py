@@ -1,6 +1,7 @@
 import requests
 import time
 import json
+import re
 
 from src.push_msg import Pmsg
 
@@ -29,14 +30,16 @@ class oDaily(object):
 
                     for n in range(len(m_json)):
                         content = m_json[n]['description']
+                        content_text = re.sub(r'<[^>]+>', '', content)
+
                         content_title = m_json[n]['title']
                         news_id = m_json[n]['id']
-                        news_url = 'www.odaily.news/newsflash/{0}'.format(id)
+                        news_url = 'www.odaily.news/newsflash/{0}'.format(news_id)
                         if self.topid == news_id:
                             print("od_topid == json_id")
                             break
                         else:
-                            Pmsg.sendmeg(news_url, content, content_title)
+                            Pmsg.sendmeg(news_url, content_text, content_title, "oDaily")
                             time.sleep(3)
 
                     self.topid = m_json[0]['id']

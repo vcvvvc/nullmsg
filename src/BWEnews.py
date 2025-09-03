@@ -60,7 +60,7 @@ class BWEnews(object):
                             # print(f"【内容】:\n{final_content}\n")
                             # print(f"【链接】: {entry.link}")
                             # print("-" * 50)
-                            Pmsg.sendmeg(link, final_content, final_title)
+                            Pmsg.sendmeg(link, final_content, final_title, "BWEnews")
 
                     self.topid = current_latest_id
                     print("bwe_发送成功 timesleep")

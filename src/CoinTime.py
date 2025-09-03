@@ -35,12 +35,12 @@ class CoinTime(object):
                             print("od_topid == json_id")
                             break
                         else:
-                            Pmsg.sendmeg(news_url, content, content_title)
+                            Pmsg.sendmeg(news_url, content, content_title, "CoinTime")
                             time.sleep(3)
 
                     self.topid = m_json[0]['itemId']
                     print("cointime_发送成功 timesleep")
-                time.sleep(1200)
+                time.sleep(600)
             except Exception as e:
                 time.sleep(600)
                 print(e)

@@ -38,7 +38,7 @@ class Pannews(object):
                             news_url = 'www.panewslab.com/zh/sqarticledetails/{0}.html'.format(id)
                             if self.art_id == id:
                                 break
-                            Pmsg.sendmeg(news_url, content.replace("\r\n", "\n"), content_prefix)
+                            Pmsg.sendmeg(news_url, content.replace("\r\n", "\n"), content_prefix, "Pannews")
                             time.sleep(3)
                         except Exception as e:
                             print(e)

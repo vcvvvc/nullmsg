@@ -15,6 +15,7 @@ class TOKEN_IN(object):
 
     def get_news(self):
         while True:
+            break
             # cookie_jar = session.get('https://cn.tokeninsight.com/zh/news').cookies
             # cookie_t = requests.utils.dict_from_cookiejar(cookie_jar)
             m_json = ''

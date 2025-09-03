@@ -5,6 +5,7 @@ import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from http.server import HTTPServer, SimpleHTTPRequestHandler
+from src.CoinTime import coin_time
 from src.BlockBeats import beat
 from src.TreeNews import tree
 from src.BWEnews import bwe
@@ -15,38 +16,27 @@ from src.PanNews import PAN
 
 def run():
     """
-    优化后的主运行函数，使用线程池管理线程
+    启动所有任务为后台守护线程并立即返回，让主线程继续执行 heartbeat。
     """
     try:
-        # 定义任务列表
         tasks = [
-            # ('Jinse', Js.get_news),
-            # ('Odaily', oda.get_news),
-            # ('Tuoluo', Tl.get_news),
-            # ('PanNews', PAN.get_news),
-            # ('BWENews', bwe.get_news),
-            # ('TreeNews', tree.get_news),
+            ('Jinse', Js.get_news),
+            ('Odaily', oda.get_news),
+            ('CoinTime', coin_time.get_news),
+            ('Tuoluo', Tl.get_news),
+            ('PanNews', PAN.get_news),
+            ('BWENews', bwe.get_news),
+            ('TreeNews', tree.get_news),
             ('Beats', beat.get_news),
             ('WebServer', server)
         ]
-        
-        # 使用线程池执行任务
-        with ThreadPoolExecutor(max_workers=len(tasks)) as executor:
-            # 提交所有任务
-            future_to_task = {
-                executor.submit(task_func): task_name 
-                for task_name, task_func in tasks
-            }
-            
-            # 处理完成的任务
-            for future in as_completed(future_to_task):
-                task_name = future_to_task[future]
-                try:
-                    result = future.result()
-                    print(f"任务 {task_name} 执行完成")
-                except Exception as e:
-                    print(f"任务 {task_name} 执行失败: {str(e)}")
-                    
+
+        for task_name, task_func in tasks:
+            t = threading.Thread(target=task_func, name=f"{task_name}Thread", daemon=True)
+            t.start()
+            print(f"✅ 任务 {task_name} 已作为守护线程启动: {t.name}")
+
+        return True
     except Exception as e:
         print(f"运行主函数时发生错误: {str(e)}")
         raise
@@ -62,47 +52,33 @@ def server():
 
 def heartbeat(): #render无活动时间久了会暂停服务，定时get活动一下
     while True:
-        time.sleep(60)
+        time.sleep(10)
         try:
             pushurl = 'https://pushmsg24h.onrender.com'
             sendurl = 'https://bark-test-cje9.onrender.com'
             headers2 = {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15'
             }
-            res = requests.get(sendurl, headers=headers2, timeout=60)
-            if res.status_code != 200 or res.status_code != 404:
-                res = requests.get(sendurl, headers=headers2, timeout=60)
+            res = requests.get(sendurl, headers=headers2, timeout=10)
+            if res.status_code != 200 and res.status_code != 404:
+                res = requests.get(sendurl, headers=headers2, timeout=20)
 
-            requests.get(pushurl, headers=headers2, timeout=60)
-            if res.status_code != 200 or res.status_code != 404:
-                requests.get(pushurl, headers=headers2, timeout=60)
-        except:
+            requests.get(pushurl, headers=headers2, timeout=10)
+            if res.status_code != 200 and res.status_code != 404:
+                requests.get(pushurl, headers=headers2, timeout=20)
+
+            time.sleep(20)    
+        except Exception as e:
+            print(e)
             continue
 
 if __name__ == '__main__':
-    print("=" * 50)
-    print("🚀 启动 nullmsg 服务...")
-    print("=" * 50)
-    print("📋 服务列表:")
-    print("   • Jinse 新闻服务")
-    print("   • Odaily 新闻服务") 
-    print("   • Tuoluo 新闻服务")
-    print("   • PanNews 新闻服务")
-    print("   • BWEnews 新闻服务")
-    print("   • Treenews 新闻服务")
-    print("   • BlockBeats 新闻服务")
-    print("   • Web 服务器")
-    print("   • 心跳检测服务")
-    print("=" * 50)
-    
+   
     try:
         run()
         print("✅ 所有服务启动成功！")
         print("💓 心跳检测服务已启动...")
         heartbeat()
-    except KeyboardInterrupt:
-        print("\n⚠️  收到中断信号，正在关闭服务...")
-        print("👋 服务已停止")
     except Exception as e:
         print(f"❌ 服务启动失败: {str(e)}")
         print("🔍 请检查日志文件或配置")
