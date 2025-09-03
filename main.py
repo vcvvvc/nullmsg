@@ -5,6 +5,7 @@ import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from http.server import HTTPServer, SimpleHTTPRequestHandler
+from src.BlockBeats import beat
 from src.TreeNews import tree
 from src.BWEnews import bwe
 from src.jinse import Js
@@ -19,12 +20,13 @@ def run():
     try:
         # 定义任务列表
         tasks = [
-            ('Jinse', Js.get_news),
-            ('Odaily', oda.get_news),
-            ('Tuoluo', Tl.get_news),
-            ('PanNews', PAN.get_news),
-            ('BWENews', bwe.get_news),
-            ('TreeNews', tree.get_news),
+            # ('Jinse', Js.get_news),
+            # ('Odaily', oda.get_news),
+            # ('Tuoluo', Tl.get_news),
+            # ('PanNews', PAN.get_news),
+            # ('BWENews', bwe.get_news),
+            # ('TreeNews', tree.get_news),
+            ('Beats', beat.get_news),
             ('WebServer', server)
         ]
         
@@ -88,6 +90,7 @@ if __name__ == '__main__':
     print("   • PanNews 新闻服务")
     print("   • BWEnews 新闻服务")
     print("   • Treenews 新闻服务")
+    print("   • BlockBeats 新闻服务")
     print("   • Web 服务器")
     print("   • 心跳检测服务")
     print("=" * 50)
