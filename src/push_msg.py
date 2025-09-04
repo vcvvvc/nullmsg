@@ -63,6 +63,7 @@ class PushMsg(object):
 
     def sendmeg(self, news_url, news_content, news_title, news_platform: str = " "): #rebder
         ciphertext = self.deal_msg(news_url, news_content, news_title, news_platform)
+        time.sleep(1)
         data = {
             "ciphertext": ciphertext,
             # "iv": "{0}".format(self.aes_iv),

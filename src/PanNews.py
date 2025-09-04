@@ -7,48 +7,47 @@ from src.push_msg import Pmsg
 class Pannews(object):
     def __init__(self):
         self.topid = 0
-        self.art_id = 'en5mtun6'
+        self.art_id = '1'
 
     def get_news(self):
         while True:
             url = 'https://www.panewslab.com/webapi/flashnews?LId=1&LastTime=0&Rn=20&tw=0'
             headers = {
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-                'Host': 'www.panewslab.com'
+                'Host': 'www.panewslab.com',
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:142.0) Gecko/20100101 Firefox/142.0',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2'
             }
             try:
                 res = requests.get(url, headers=headers, timeout=30)
                 if res.status_code == 200:
                     m_json = json.loads(res.text)
                     m_list = m_json['data']['flashNews']
-                    m_id = m_list[0]['unix']
-                    if self.topid >= m_id:
-                        print('pan_topid == json_topid' )
+
+                    m_flashNews = m_list[0]['list']
+                    if self.art_id == m_flashNews[0]['id']:
+                        print('pan_art_id == json_art_id')
                         time.sleep(300)
                         continue
-
-                    m_lives = m_list[0]['list']
-                    # print(m_lives)
-                    for n in range(len(m_lives)):
+                    
+                    for news in m_flashNews:
                         try:
-                            content = m_lives[n]['desc']
-                            content_prefix = m_lives[n]['title']
-                            id = m_lives[n]['id']
-                            news_url = 'www.panewslab.com/zh/sqarticledetails/{0}.html'.format(id)
-                            if self.art_id == id:
+                            content = news['desc']
+                            title = news['title']
+                            news_id = news['id']
+                            news_url = 'www.panewslab.com/zh/articles/{0}'.format(news_id)
+                            if self.art_id == news_id:
                                 break
-                            Pmsg.sendmeg(news_url, content.replace("\r\n", "\n"), content_prefix, "Pannews")
+                            Pmsg.sendmeg(news_url, content.replace("\r\n", "\n"), title, "Pannews")
                             time.sleep(3)
                         except Exception as e:
                             print(e)
 
-                    self.topid = m_id
-                    self.art_id = m_lives[0]['id']
+                    self.art_id = m_flashNews[0]['id']
                     print("pan_发送成功 timesleep")
-                time.sleep(300)
+                time.sleep(600)
             except Exception as e:
                 print(e)
                 time.sleep(600)
 
-PAN = Pannews()
+Pan = Pannews()

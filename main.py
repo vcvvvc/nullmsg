@@ -12,7 +12,7 @@ from src.BWEnews import bwe
 from src.jinse import Js
 from src.odaily import oda
 from src.tuoluo import Tl
-from src.PanNews import PAN
+from src.PanNews import Pan
 
 # 全局变量，用于存储和管理线程
 running_threads = {}
@@ -34,7 +34,7 @@ def run():
         ('Odaily', oda.get_news),
         # ('CoinTime', coin_time.get_news),
         # ('Tuoluo', Tl.get_news),
-        ('PanNews', PAN.get_news),
+        ('PanNews', Pan.get_news),
         ('BWENews', bwe.get_news),
         ('TreeNews', tree.get_news),
         ('Beats', beat.get_news),
