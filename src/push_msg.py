@@ -65,7 +65,7 @@ class PushMsg(object):
         ciphertext = self.deal_msg(news_url, news_content, news_title, news_platform)
         data = {
             "ciphertext": ciphertext,
-            "iv": "{0}".format(self.aes_iv),
+            # "iv": "{0}".format(self.aes_iv),
         }
 
         sendurl = 'https://bark-test-cje9.onrender.com/quicknews'
