@@ -28,8 +28,6 @@ class PushMsg(object):
         try:
             self.cipher = AES.new(self.aes_key.encode(), AES.MODE_CBC, self.aes_iv.encode())
 
-            # m_json = f'{{"title": "{0}","body": "{1}", "url": "{2}", "sound": "healthnotification", "group": {3}}}'.format(
-                # news_title.replace("\"", "\\\""), news_content.replace("\n", "\\n").replace("\"", "\\\""), news_url, news_platform)
             data_dict = {
                 "title": news_title,
                 "body": news_content,
