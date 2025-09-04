@@ -22,19 +22,24 @@ class BlockBeats(object):
                 if res.status_code == 200:
                     m_json = json.loads(res.text)
                     m_list = m_json['data']['list']
-                    m_id = m_list[0]['article_id']
-                    # print(m_id, "\n")
-
-
-                    if self.topid == m_id:
-                        print('beats_topid == json_topid' )
+                    
+                    # 检查列表是否为空
+                    if not m_list:
+                        print("BlockBeats: 新闻列表为空")
                         time.sleep(300)
                         continue
                     
+                    m_id = m_list[0]['article_id']
+                    
                     # https://www.theblockbeats.info/flash/310574
                     for bnews in m_list:
-                        try:
+                        try:                            
                             article_id = bnews.get('article_id')
+                            if self.topid == article_id:
+                                print('beats_topid == json_topid' )
+                                time.sleep(300)
+                                break
+                                
                             title = bnews.get('title', '')
                             content_html = bnews.get('content', '')
                             content_text = re.sub(r'<[^>]+>', '', content_html)
