@@ -32,8 +32,8 @@ def run():
         # 新闻采集服务
         ('Jinse', Js.get_news),
         ('Odaily', oda.get_news),
-        ('CoinTime', coin_time.get_news),
-        ('Tuoluo', Tl.get_news),
+        # ('CoinTime', coin_time.get_news),
+        # ('Tuoluo', Tl.get_news),
         ('PanNews', PAN.get_news),
         ('BWENews', bwe.get_news),
         ('TreeNews', tree.get_news),
