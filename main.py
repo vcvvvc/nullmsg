@@ -146,7 +146,7 @@ def heartbeat(): #render无活动时间久了会暂停服务，定时get活动�
     while True:
         time.sleep(10)
         try:
-            pushurl = 'https://pushmsg24h.onrender.com'
+            pushurl = 'https://pushnews.onrender.com'
             sendurl = 'https://bark-test-cje9.onrender.com'
             headers2 = {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15'
