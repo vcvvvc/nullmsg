@@ -30,7 +30,7 @@ def run():
         # 核心服务优先启动
         ('WebServer', server),
         # 新闻采集服务
-        ('Jinse', Js.get_news),
+        # ('Jinse', Js.get_news),
         ('Odaily', oda.get_news),
         # ('CoinTime', coin_time.get_news),
         # ('Tuoluo', Tl.get_news),

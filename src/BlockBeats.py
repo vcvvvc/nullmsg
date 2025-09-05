@@ -54,7 +54,7 @@ class BlockBeats(object):
 
                     self.topid = m_id
                     print("beats_发送成功 timesleep")
-                time.sleep(300)
+                time.sleep(600)
             except Exception as e:
                 print(e)
                 time.sleep(600)

@@ -64,7 +64,7 @@ class BWEnews(object):
 
                     self.topid = current_latest_id
                     print("bwe_发送成功 timesleep")
-                time.sleep(300)
+                time.sleep(600)
             except Exception as e:
                 print(e)
                 time.sleep(600)

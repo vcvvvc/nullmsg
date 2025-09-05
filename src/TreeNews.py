@@ -27,16 +27,13 @@ class Treenews(object):
                         # print(id)
 
                         if self.topid == id:
-                            time.sleep(3)
+                            time.sleep(180)
                             break
 
                         title = news['title']
                         link = news['url'].replace("https://", "www.")       
                         content = ' '
-                        # print(news['title'])
-                        # print(f"🔗 【链接】: {link}")
-                        # print(f"📡 【来源】: {news.get('source', 'Unknown')}")
-                        # print(f"🆔 【消息ID】: {id}")
+
 
                         if news['source'] == "Twitter":
                             # 使用 ': '作为分隔符，并且设置 maxsplit=1 表示只分割一次
