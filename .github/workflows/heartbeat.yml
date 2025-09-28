@@ -1,32 +1,32 @@
-name: Heartbeat Service
+# name: Heartbeat Service
 
-on:
-  schedule:
-    # 每5分钟运行一次
-    - cron: '*/5 * * * *'
-  workflow_dispatch: # 允许手动触发
+# on:
+#   schedule:
+#     # 每5分钟运行一次
+#     - cron: '*/6 * * * *'
+#   workflow_dispatch: # 允许手动触发
 
-jobs:
-  heartbeat:
-    runs-on: ubuntu-latest
+# jobs:
+#   heartbeat:
+#     runs-on: ubuntu-latest
     
-    steps:
-    - name: 检查代码
-      uses: actions/checkout@v4
+#     steps:
+#     - name: 检查代码
+#       uses: actions/checkout@v4
       
-    - name: 设置Python环境
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
+#     - name: 设置Python环境
+#       uses: actions/setup-python@v4
+#       with:
+#         python-version: '3.11'
         
-    - name: 安装依赖
-      run: |
-        pip install requests
+#     - name: 安装依赖
+#       run: |
+#         pip install requests
         
-    - name: 执行心跳检测
-      run: python heartbeat.py
+#     - name: 执行心跳检测
+#       run: python heartbeat.py
         
-    - name: 显示结果
-      run: |
-        echo "✅ 心跳检测任务完成"
-        echo "🕐 下次运行时间: 10分钟后"
+#     - name: 显示结果
+#       run: |
+#         echo "✅ 心跳检测任务完成"
+#         echo "🕐 下次运行时间: 10分钟后"
