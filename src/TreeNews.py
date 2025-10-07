@@ -12,7 +12,7 @@ class Treenews(object):
     def get_news(self):
         while True:
             m_json = ''
-            url = 'https://news.treeofalpha.com/api/news?limit=10'
+            url = 'https://news.treeofalpha.com/api/news?limit=5'
             headers = {
                 'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
             }
@@ -23,11 +23,10 @@ class Treenews(object):
                     # print(tree_json[0]['_id'])
 
                     for news in tree_json:    
-                        id = news['_id']
-                        # print(id)
+                        nid = news['_id']
 
-                        if self.topid == id:
-                            time.sleep(180)
+                        if self.topid == nid:
+                            time.sleep(380)
                             break
 
                         title = news['title']
@@ -46,12 +45,12 @@ class Treenews(object):
                                 # 列表的第二个元素是 content
                                 content = parts[1]
                         Pmsg.sendmeg(link, content, title, "Treenews")
-                        time.sleep(3)
+                        time.sleep(5)
                         
                     self.topid = tree_json[0]['_id']
                     print("Treenews_发送成功 timesleep")
 
-                time.sleep(300)    
+                time.sleep(600)
             except Exception as e:
                 print(e)
                 time.sleep(600)

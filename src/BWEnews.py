@@ -10,6 +10,10 @@ class BWEnews(object):
         self.topid = None
         self.date = ''
 
+        self.last_request_time = 0  # 记录上次请求时间
+        self.min_interval = 60  # 最小请求间隔60秒
+        self.adaptive_interval = 120  # 自适应间隔，初始120秒
+
     def get_entry_id(self, entry):
         return entry.get('id', entry.get('link'))
 
@@ -27,21 +31,20 @@ class BWEnews(object):
 
                     if not feed.entries:
                         print("Feed 为空或解析失败，稍后重试。")
-                        time.sleep(300)
+                        time.sleep(200)
                         continue
 
                     current_latest_entry = feed.entries[0]
                     current_latest_id = self.get_entry_id(current_latest_entry)
 
                     if current_latest_id == self.topid:
-                        print('od_topid == json_topid')
-                        time.sleep(300)
+                        print('bwe_topid == json_topid')
+                        time.sleep(100)
                         continue
 
                     # 从最新的一条开始遍历，直到找到上次记录的ID
                     for entry in feed.entries:
                         entry_id = self.get_entry_id(entry)
-                        # print("entry: ", entry, "\n")
                          # 1. 直接使用 '<br/>' 作为分隔符对原始字符串进行分割
                         title_part, separator, content_part = entry.title.partition('<br/>')
                     
@@ -51,23 +54,18 @@ class BWEnews(object):
                         # 3. 清理首尾空格，得到最终结果
                         final_title = title_part.strip()
                         final_content = cleaned_content.strip()
-                        link = entry.link.replace('https://', 'www.')
+                        link = entry.link.replace('https://', '')
                         if entry_id == self.topid:
                             break                        
                         else:
-                            # print("=" * 50)
-                            # print(f"【标题】: {final_title}")
-                            # print(f"【内容】:\n{final_content}\n")
-                            # print(f"【链接】: {entry.link}")
-                            # print("-" * 50)
                             Pmsg.sendmeg(link, final_content, final_title, "BWEnews")
 
                     self.topid = current_latest_id
                     print("bwe_发送成功 timesleep")
-                time.sleep(600)
+                time.sleep(200)
             except Exception as e:
                 print(e)
-                time.sleep(600)
+                time.sleep(300)
 
 
 bwe = BWEnews()
