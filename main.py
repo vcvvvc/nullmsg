@@ -36,7 +36,7 @@ def run():
         # ('Tuoluo', Tl.get_news),
         ('PanNews', Pan.get_news),
         ('BWENews', bwe.get_news),
-        ('TreeNews', tree.get_news),
+        # ('TreeNews', tree.get_news),
         ('Beats', beat.get_news),
     ]
 
