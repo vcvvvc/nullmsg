@@ -19,7 +19,6 @@ class BWEnews(object):
 
     def get_news(self):
         while True:
-            m_json = ''
             url = 'https://rss-public.bwe-ws.com/'
             headers = {
                 'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
@@ -34,18 +33,24 @@ class BWEnews(object):
                         time.sleep(300)
                         continue
 
-                    current_latest_entry = feed.entries[0]
+                    # 获取最新的消息（feed.entries[-1]是最新的，feed.entries[0]是最旧的）
+                    current_latest_entry = feed.entries[-1]
                     current_latest_id = self.get_entry_id(current_latest_entry)
 
+                    # 如果最新消息的ID就是上次记录的ID，说明没有新消息，直接跳过
                     if current_latest_id == self.topid:
                         print('bwe_topid == json_topid')
                         time.sleep(59)
                         continue
 
                     # 从最新的一条开始遍历，直到找到上次记录的ID
-                    for entry in feed.entries:
+                    processed_count = 0
+                    # 从最新消息开始向前处理（倒序遍历）
+                    for i in range(len(feed.entries) - 1, -1, -1):
+                        entry = feed.entries[i]
                         entry_id = self.get_entry_id(entry)
-                         # 1. 直接使用 '<br/>' 作为分隔符对原始字符串进行分割
+                        
+                        # 1. 直接使用 '<br/>' 作为分隔符对原始字符串进行分割
                         title_part, separator, content_part = entry.title.partition('<br/>')
                     
                         # 2. 对分割后的 content_part 进行 <br/> -> \n 的替换
@@ -55,16 +60,27 @@ class BWEnews(object):
                         final_title = title_part.strip()
                         final_content = cleaned_content.strip()
                         link = entry.link.replace('https://', '')
+                        
+                        # 如果遇到上次记录的ID，说明之前的消息都已经处理过了，停止处理
                         if entry_id == self.topid:
-                            break                        
+                            break
                         else:
+                            # 发送消息
                             Pmsg.sendmeg(link, final_content, final_title, "BWEnews")
+                            processed_count += 1
+                            print(f"已处理消息 ID: {entry_id}")
 
+                    # 处理完所有新消息后，更新topid为当前最新条目的ID
                     self.topid = current_latest_id
-                    print("bwe_发送成功 timesleep")
-                time.sleep(120)
+
+                    if processed_count > 0:
+                        print(f"bwe_发送成功，共处理 {processed_count} 条消息")
+                    else:
+                        print("bwe_没有新消息")
+                        
+                time.sleep(60)
             except Exception as e:
-                print(e)
+                print(f"处理过程中出现异常: {e}")
                 time.sleep(300)
 
 
