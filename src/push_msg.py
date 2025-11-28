@@ -1,19 +1,22 @@
-import platform
 import requests
-import threading
 import base64
 import json
 import time
-
 from Crypto.Cipher import AES
 from src.config import config
 
-mutex = threading.Lock() # 创建一个锁对象
 
 class PushMsg(object):
     def __init__(self):
-        self.serv_host = config.get_server_host()
-        self.serv_key = config.get_server_key()
+        # 优先读取配置，如果没有配置则给一个默认值或报错
+        host = config.get_server_host()
+        if not host:
+            # 也可以选择在这里硬编码作为兜底，或者抛出异常
+            host = 'https://bark-test-cje9.onrender.com'
+
+            # 自动拼接路径，避免硬编码整个 URL
+        self.sendurl = f"{host.rstrip('/')}/quicknews"
+
         self.aes_key = config.get_aes_key()
         self.aes_iv = config.get_aes_iv()
 
@@ -21,12 +24,15 @@ class PushMsg(object):
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15',
         }
 
-
     def deal_msg(self, news_url, news_content, news_title, news_platform):
-        mutex.acquire()  # 获取锁
-
+        """
+        加密处理逻辑
+        不需要锁(mutex)，因为这里只使用局部变量，天然线程安全。
+        """
         try:
-            self.cipher = AES.new(self.aes_key.encode(), AES.MODE_CBC, self.aes_iv.encode())
+            # 1. 每次加密创建一个新的 cipher 对象 (局部变量，不要用 self.cipher)
+            # encode() 默认是 utf-8
+            cipher = AES.new(self.aes_key.encode('utf-8'), AES.MODE_CBC, self.aes_iv.encode('utf-8'))
 
             data_dict = {
                 "title": news_title,
@@ -38,59 +44,54 @@ class PushMsg(object):
 
             m_json = json.dumps(data_dict, ensure_ascii=False)
 
-            # print(m_json)
+            # 2. PKCS7 Padding
+            message_bytes = m_json.encode('utf-8')
+            pad_length = 16 - len(message_bytes) % 16
+            message_bytes += bytes([pad_length]) * pad_length
 
-            # 把字符串转换为字节
-            message = m_json.encode()
-            # 对字节进行填充，使其长度为16的倍数
-            pad_length = 16 - len(message) % 16
-            message += bytes([pad_length]) * pad_length
-            # 加密字节
-            token = self.cipher.encrypt(message)
-            # 把加密后的字节转换为base64字符串
-            token = base64.b64encode(token).decode()
+            # 3. 加密
+            encrypted_bytes = cipher.encrypt(message_bytes)
+
+            # 4. Base64 编码
+            token = base64.b64encode(encrypted_bytes).decode('utf-8')
 
             return token
+
         except Exception as e:
-            print(e)
-        finally:
-            mutex.release()
+            print(f"❌ 加密失败: {e}")
+            return None
 
-
-
-
-    def sendmeg(self, news_url, news_content, news_title, news_platform: str = " "): #rebder
+    def sendmeg(self, news_url, news_content, news_title, news_platform: str = "Common"):
+        # 1. 获取密文
         ciphertext = self.deal_msg(news_url, news_content, news_title, news_platform)
-        time.sleep(1)
+
+        # 2. 如果加密失败（返回None），直接终止，不要发送空请求
+        if not ciphertext:
+            print(f"⚠️ 跳过发送: 加密失败 - {news_title}")
+            return
+
+        # 移除不必要的 time.sleep(1)
+
         data = {
             "ciphertext": ciphertext,
-            # "iv": "{0}".format(self.aes_iv),
         }
-
-        sendurl = 'https://bark-test-cje9.onrender.com/quicknews'
 
         max_retries = 3
         for attempt in range(max_retries):
             try:
-                res = requests.post(sendurl, headers=self.headers, data=data, timeout=30)
-                
-                # 1. 检查HTTP错误状态码 (4xx 或 5xx)，如果出错会自动抛出异常
-                res.raise_for_status() 
+                # 使用 self.sendurl 而不是硬编码
+                res = requests.post(self.sendurl, headers=self.headers, data=data, timeout=30)
+                res.raise_for_status()  # 检查 404, 500 等错误
 
-                # 如果代码能走到这里，说明 status_code 一定是 2xx (成功)
-                print(f'发送成功 ({attempt + 1}/{max_retries} 次): {res.text} ---- {news_platform}')
-                
-                break             
+                print(f'✅ 发送成功: {news_platform} - {news_title[:10]}...')
+                break  # 成功则跳出循环
+
             except requests.exceptions.RequestException as e:
-                print(f'发送失败 (尝试 {attempt + 1}/{max_retries} 次): {e}')
-                
+                print(f'⚠️ 发送失败 ({attempt + 1}/{max_retries}): {e}')
                 if attempt < max_retries - 1:
-                    time.sleep(1) # 等待1秒
-                
-        # 4. for循环的else子句: 只有当循环正常结束(即没有被break)，才会执行
+                    time.sleep(2)  # 失败后稍微等待再重试
         else:
-            # 如果循环完了都没有break，说明所有重试都失败了
-            print(f'错误：在尝试 {max_retries} 次后，消息发送最终失败。')
+            print(f'❌ 错误: {news_title} 发送最终失败。')
+
 
 Pmsg = PushMsg()
-
