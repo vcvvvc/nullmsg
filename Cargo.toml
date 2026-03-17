@@ -1,0 +1,7 @@
+[package]
+name = "nullmsg"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# 依赖将随着学习进度逐步添加
