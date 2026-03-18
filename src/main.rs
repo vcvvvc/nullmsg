@@ -1,3 +1,4 @@
+use std::time::Duration;
 mod crypto;
 
 #[derive(serde::Deserialize)]
@@ -8,8 +9,8 @@ struct Config {
     aes_iv: String,
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let stext = std::fs::read_to_string("./config.toml")?;
     // println!("{}", stext);
 
@@ -20,10 +21,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("aes_key     = {}", cfg.aes_key);
     println!("aes_iv      = {}", cfg.aes_iv);
 
-    let encoded = crypto::encrypt("这是密码", &cfg.server_key, &cfg.aes_iv);
+    let encoded = crypto::encrypt("这是密码", &cfg.aes_key, &cfg.aes_iv);
     println!("encrypt = {}", encoded);
 
-
+    tokio::time::sleep(Duration::from_millis(100)).await;
+    println!("tokio 异步运行正常");
 
     Ok(())
 }
