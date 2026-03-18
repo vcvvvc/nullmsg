@@ -10,11 +10,24 @@
 
 将 Python 加密货币新闻聚合推送系统重写为 Rust 版本。
 
+- `main` 分支：Python 基线实现（行为对齐基准）
+- `msg_rust` 分支：Rust 重写实现（当前开发分支）
+
+### 对齐范围（以 main 为基线）
+
+- 配置读取与解析
+- AES-CBC + Base64 加密
+- 推送 POST + 重试机制
+- 4 路新闻源采集
+- 主线程 HTTP Server 常驻
+- 不实现心跳保活逻辑（heartbeat 不在本次重写范围）
+
 ### 核心约束
 
 - 主线程运行 HTTP Server（防止平台休眠）
 - 后台异步运行 4 个爬虫
 - 配置文件：config.toml
+- 以 `main` 行为为验收基准，不做无来源扩展功能
 
 ---
 
@@ -102,7 +115,7 @@ cbc = "0.1"
 **任务 4.1：实现 AES-CBC 加密**
 
 - 实现 PKCS7 填充
-- 实现 `encrypt(text, key, iv) -> String`
+- 实现 `encrypt(text, key, iv) -> Result<String, EncryptError>`
 
 **学到什么**：
 - 字节操作
@@ -123,7 +136,7 @@ tokio = { version = "1", features = ["rt-multi-thread", "macros", "time"] }
 **任务 5.1：改造 main 为异步**
 
 - 添加 `#[tokio::main]`
-- 实现简单的异步定时器
+- 实现简单的异步定时器（使用 `tokio::time::interval`，仅用于异步机制验证）
 
 **学到什么**：
 - async/await 语法
@@ -225,7 +238,37 @@ async-trait = "*"          # Trait 抽象
 - [x] 阶段 2：引入 toml 库
 - [x] 阶段 3：base64 编码
 - [x] 阶段 4：AES-CBC 加密
-- [ ] 阶段 5：tokio 异步基础（待解锁）
+- [x] 阶段 5：tokio 异步基础
+
+---
+
+## 当前差距（审查后）
+
+- [x] `crypto::encrypt` 已重构为 `Result` 返回，并完成 key/iv 长度校验（已移除 panic 路径）
+- [x] 阶段 5 的异步定时器示例已在 `main.rs` 落地（`tokio::time::interval` 最小 tick 验证）
+- [ ] 阶段 6 仅完成依赖引入，尚未实现首个爬虫请求与 JSON 解析
+
+---
+
+## 接手执行清单（2026-03-19）
+
+- [x] S0：核对仓库现状（分支、入口文件、依赖、`_PLAN.md` 进度）并确认当前主差距
+- [x] S1：在 `main.rs` 落地阶段 5 的 `tokio::time::interval` 最小异步定时器示例
+- [ ] S2：实现阶段 6 的首个爬虫请求 + JSON 反序列化最小闭环
+- [ ] S3：执行 `cargo fmt && cargo check && cargo clippy && cargo run` 验证并回填结果
+
+---
+
+## 交接说明（当前工作终止）
+
+- 当前轮在此终止，由新的接任者继续执行。
+- 接任起点（按顺序）：
+  1. 完成阶段 5：在 `main.rs` 落地 `tokio::time::interval` 的最小异步定时器示例。
+  2. 完成阶段 6：实现第一个爬虫请求与 JSON 反序列化闭环。
+  3. 保持验收基准：所有行为对齐 `main` 分支（Python 基线），且 heartbeat 继续保持 out-of-scope。
+- 接任前快速验证命令：
+  1. `cargo fmt && cargo check && cargo clippy`
+  2. `cargo run`
 
 ---
 
@@ -233,6 +276,6 @@ async-trait = "*"          # Trait 抽象
 
 每个阶段完成后：
 
-1. `cargo check` - 检查编译
+1. `cargo fmt && cargo check && cargo clippy` - 检查编译
 2. `cargo run` - 运行程序
 3. 观察输出，确认功能正常
