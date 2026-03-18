@@ -107,7 +107,32 @@ cargo run  # 打印出 4 个字段的值
 
 ## 当前进度
 
-- [ ] Step 1：定义 Config 结构体
-- [ ] Step 2：读取文件
-- [ ] Step 3：Result + ? 操作符
-- [ ] Step 4：解析配置
+- [x] M1 Step 1：定义 Config 结构体
+- [x] M1 Step 2：读取文件（std::fs::read_to_string）
+- [x] M1 Step 3：Result + ? 操作符
+- [x] M1 Step 4：手动解析 config.toml
+- [x] M2：引入 toml + serde，一行替换手动解析
+- [x] M3：创建 crypto 模块，实现 encode_base64
+
+---
+
+## 下一步：M4 - AES-CBC 加密
+
+### 概念
+- PKCS7 填充
+- AES-CBC 加密模式
+- 字节数组操作 `&[u8]`
+
+### 依赖
+```toml
+aes = "0.8"
+cbc = "0.1"
+```
+
+### 任务
+在 `src/crypto.rs` 里实现：
+```rust
+pub fn encrypt(text: &str, key: &str, iv: &str) -> String
+```
+
+返回 base64 编码的加密结果。
