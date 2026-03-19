@@ -3,6 +3,6 @@ server_host = "https://bark-test-cje9.onrender.com"
 # bark里的key
 server_key = "test_server_key"
 # AES256 32位
-aes_key = "93b17c65aad0994ef7d53cab367c479f"
+aes_key = "9d2e1cbce41993558a214853f0fcc189"
 # 前16位偏移位
-aes_iv = "f4191a44c30bdd6b"
+aes_iv = "c96c10a1944f4862"
