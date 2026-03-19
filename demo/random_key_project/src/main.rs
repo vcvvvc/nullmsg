@@ -9,7 +9,7 @@ fn to_hex(bytes: &[u8]) -> String {
 }
 
 fn main() -> Result<(), Error> {
-    // Why: 这里保持与 demo/random_key.py 完全一致，便于替换脚本时对比输出行为。
+    // Why: 与 Python demo 脚本保持同一输出语义，便于替换与核对。
     let mut key = [0_u8; 16];
     let mut iv = [0_u8; 16];
     getrandom::fill(&mut key).map_err(|e| Error::new(ErrorKind::Other, e.to_string()))?;
