@@ -2,7 +2,7 @@ use crate::pusher::{PushNews, Pusher};
 use std::fmt::Display;
 use tokio::sync::mpsc;
 
-const SEND_INTERVAL_SECS: u64 = 1;
+const SEND_INTERVAL_SECS: u64 = 5;
 const SEND_QUEUE_SIZE: usize = 1024;
 const SENDER_RETRY_SECS: u64 = 60;
 
