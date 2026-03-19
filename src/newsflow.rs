@@ -4,6 +4,7 @@ use tokio::sync::mpsc;
 
 const SEND_INTERVAL_SECS: u64 = 1;
 const SEND_QUEUE_SIZE: usize = 1024;
+const SENDER_RETRY_SECS: u64 = 60;
 
 #[derive(Debug)]
 pub struct UnifiedNewsItem {
@@ -20,14 +21,20 @@ pub fn build_news_queue() -> (NewsSender, NewsReceiver) {
     mpsc::channel(SEND_QUEUE_SIZE)
 }
 
-pub async fn run_global_sender(
-    mut receiver: NewsReceiver,
-) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    // Why: 全局只保留一个发送器实例，确保所有来源共享同一节流窗口，避免并发推送打爆通知端。
-    let pusher = Pusher::from_config_file("./config.toml")?;
+pub async fn run_global_sender(mut receiver: NewsReceiver) {
+    // Why: 发送线程必须自恢复；即便启动时配置/IO短暂失败，也不能让全局推送链路永久中断。
+    let pusher = loop {
+        match Pusher::from_config_file("./config.toml") {
+            Ok(pusher) => break pusher,
+            Err(err) => {
+                println!("global sender init failed: {err}");
+                tokio::time::sleep(std::time::Duration::from_secs(SENDER_RETRY_SECS)).await;
+            }
+        }
+    };
     while let Some(payload) = receiver.recv().await {
         match pusher.send_news(&payload).await {
-            Ok(()) => println!("push ok [{}]: {}", payload.group, payload.title),
+            Ok(()) => println!("push ok [{}]", payload.group),
             Err(err) => println!(
                 "push failed [{}]: {} | {}",
                 payload.group, payload.title, err
@@ -35,7 +42,6 @@ pub async fn run_global_sender(
         }
         tokio::time::sleep(std::time::Duration::from_secs(SEND_INTERVAL_SECS)).await;
     }
-    Ok(())
 }
 
 pub async fn process_news_batch<I>(source: &str, items: I, sender: &NewsSender)
@@ -86,12 +92,12 @@ async fn process_source_result<E>(
 
 fn log_source_preview(source_label: &str, news_list: &[UnifiedNewsItem]) {
     println!("{source_label} fetched: {} items", news_list.len());
-    for item in news_list.iter() {
-        println!(
-            "{source_label} item: {} | {} | {}",
-            item.id, item.title, item.url
-        );
-    }
+    // for item in news_list.iter() {
+    //     println!(
+    //         "{source_label} item: {} | {} | {}",
+    //         item.id, item.title, item.url
+    //     );
+    // }
 }
 
 fn map_news(group: &str, news: &UnifiedNewsItem) -> PushNews {

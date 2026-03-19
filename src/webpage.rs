@@ -14,10 +14,24 @@ pub async fn serve_index_html(listen_addr: &str, html_file: &str) -> WebResult<(
     );
 
     loop {
-        let (mut socket, _) = listener.accept().await?;
+        let (mut socket, _) = match listener.accept().await {
+            Ok(pair) => pair,
+            Err(err) => {
+                println!("web accept failed: {err}");
+                continue;
+            }
+        };
         let mut req_buf = [0u8; 512];
-        let _ = socket.read(&mut req_buf).await;
-        socket.write_all(response.as_bytes()).await?;
-        socket.shutdown().await?;
+        if let Err(err) = socket.read(&mut req_buf).await {
+            println!("web read failed: {err}");
+            continue;
+        }
+        if let Err(err) = socket.write_all(response.as_bytes()).await {
+            println!("web write failed: {err}");
+            continue;
+        }
+        if let Err(err) = socket.shutdown().await {
+            println!("web shutdown failed: {err}");
+        }
     }
 }

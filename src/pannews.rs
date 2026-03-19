@@ -1,4 +1,5 @@
 use serde::Deserialize;
+use std::time::Duration;
 
 use crate::newsflow::UnifiedNewsItem;
 
@@ -7,7 +8,7 @@ pub type PanNewsResult<T> = Result<T, Box<dyn std::error::Error + Send + Sync>>;
 // Why: 先集中定义接口常量，避免后续抓取/测试代码重复硬编码 URL，降低与 Python 基线的偏移风险。
 pub const PANNEWS_FLASH_API: &str =
     "https://universal-api.panewslab.com/articles?type=NEWS&isShowInList=true&take=20&skip=0";
-const PANNEWS_ARTICLE_PATH_PREFIX: &str = "https://www.panewslab.com/zh/articles/";
+const PANNEWS_ARTICLE_PATH_PREFIX: &str = "www.panewslab.com/zh/articles/";
 const PANNEWS_USER_AGENT: &str =
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:142.0) Gecko/20100101 Firefox/142.0";
 const PANNEWS_ACCEPT: &str = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
@@ -66,6 +67,7 @@ impl PanNewsCrawler {
             .header(reqwest::header::USER_AGENT, PANNEWS_USER_AGENT)
             .header(reqwest::header::ACCEPT, PANNEWS_ACCEPT)
             .header(reqwest::header::ACCEPT_LANGUAGE, PANNEWS_ACCEPT_LANGUAGE)
+            .timeout(Duration::from_secs(30))
             .send()
             .await?;
         if !response.status().is_success() {
