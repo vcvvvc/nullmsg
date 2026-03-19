@@ -1,5 +1,5 @@
 # 域名/ip
-server_host = "test_server_host"
+server_host = "https://bark-test-cje9.onrender.com"
 # bark里的key
 server_key = "test_server_key"
 # AES256 32位
