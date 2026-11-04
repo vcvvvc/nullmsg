@@ -5,7 +5,8 @@ use crate::newsflow::UnifiedNewsItem;
 
 pub type BlockBeatsResult<T> = Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
-pub const BLOCKBEATS_URL: &str = "https://api.blockbeats.cn/v2/newsflash/list?page=1&limit=10";
+pub const BLOCKBEATS_URL: &str =
+    "https://api-pro.theblockbeats.info/v1/newsflash?page=1&size=10&lang=cn";
 const BLOCKBEATS_FLASH_LINK_PREFIX: &str = "www.theblockbeats.info/flash/";
 const BLOCKBEATS_POLL_WITH_NEWS_SECS: u64 = 600;
 const BLOCKBEATS_POLL_IDLE_SECS: u64 = 300;
@@ -32,21 +33,36 @@ impl BlockBeatsCrawler {
         self.next_poll_secs
     }
 
-    // Why: 把“请求+反序列化”单独封装，主流程只保留增量去重语义，降低阅读复杂度。
+    // What: 调用 Pro API 并归一化为现有快讯列表结构。
+    // Why: 保持下游增量去重逻辑不变，避免来源协议升级扩散到发送链路。
     async fn fetch_payload(&self, client: &reqwest::Client) -> BlockBeatsResult<serde_json::Value> {
-        Ok(client
+        let config: toml::Value = toml::from_str(&std::fs::read_to_string("./config.toml")?)?;
+        let api_key = config
+            .get("blockbeats_api_key")
+            .and_then(toml::Value::as_str)
+            .filter(|value| !value.is_empty())
+            .ok_or_else(|| IoError::new(ErrorKind::InvalidData, "blockbeats_api_key is missing"))?;
+        let payload = client
             .get(BLOCKBEATS_URL)
-            .header(
-                reqwest::header::USER_AGENT,
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-            )
-            .header(reqwest::header::HOST, "api.blockbeats.cn")
+            .header("api-key", api_key)
             .timeout(Duration::from_secs(30))
             .send()
             .await?
             .error_for_status()?
             .json::<serde_json::Value>()
-            .await?)
+            .await?;
+        let list = payload
+            .pointer("/data/data")
+            .and_then(serde_json::Value::as_array)
+            .ok_or_else(|| IoError::new(ErrorKind::InvalidData, "blockbeats Pro data is missing"))?
+            .iter()
+            .map(|item| {
+                let mut item = item.clone();
+                item["article_id"] = item.get("id").cloned().unwrap_or_default();
+                item
+            })
+            .collect::<Vec<_>>();
+        Ok(serde_json::json!({"data": {"list": list}}))
     }
 
     // Why: 把“按 topid 截断并更新游标”固定在爬虫内，流程层无需再感知来源字段细节。
