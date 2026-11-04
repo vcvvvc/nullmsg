@@ -57,18 +57,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         client.clone(),
         sender.clone(),
     );
-    let _beats_task = spawn_source_supervisor(
-        "blockbeats",
-        news_loop::blockbeats_source,
-        client.clone(),
-        sender.clone(),
-    );
-    let _odaily_task = spawn_source_supervisor(
-        "odaily",
-        news_loop::odaily_source,
-        client.clone(),
-        sender.clone(),
-    );
+    // let _beats_task = spawn_source_supervisor(
+    //     "blockbeats",
+    //     news_loop::blockbeats_source,
+    //     client.clone(),
+    //     sender.clone(),
+    // );
+    // let _odaily_task = spawn_source_supervisor(
+    //     "odaily",
+    //     news_loop::odaily_source,
+    //     client.clone(),
+    //     sender.clone(),
+    // );
     let _bwe_task = spawn_source_supervisor("bwenews", news_loop::bwenews_source, client, sender);
     webpage::serve_index_html("0.0.0.0:10000", "index/index.html").await?;
     Ok(())
