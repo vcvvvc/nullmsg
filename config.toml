@@ -2,6 +2,8 @@
 server_host = "https://bark-test-cje9.onrender.com"
 # bark里的key
 server_key = "test_server_key"
+# BlockBeats Pro API Key
+blockbeats_api_key = "bbp_392a20ad2679b0fc4f3d039243f1c1c8777b77761ba5c7f4735b4c7198f2"
 # AES256 32位
 aes_key = "9d2e1cbce41993558a214853f0fcc189"
 # 前16位偏移位
